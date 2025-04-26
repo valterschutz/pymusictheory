@@ -1,6 +1,6 @@
-import os
 import re
 import subprocess
+import textwrap
 
 def generate_chord_xml(notes: list[str]) -> str:
     """
@@ -9,38 +9,39 @@ def generate_chord_xml(notes: list[str]) -> str:
     where X is the note name (C, D, E, etc.), b or # is optional, and Y is the octave number.
     """
 
-    template_xml = """<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise version="3.1">
-<part-list>
-    <score-part id="P1">
-    <part-name>Music</part-name>
-    </score-part>
-</part-list>
-<part id="P1">
-    <measure number="1">
-    <attributes>
-        <divisions>1</divisions>
-        <key>
-        <fifths>0</fifths>
-        </key>
-        <clef>
-        <sign>G</sign>
-        <line>2</line>
-        </clef>
-    </attributes>
+    template_xml = textwrap.dedent("""\
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+        <score-partwise version="3.1">
+        <part-list>
+            <score-part id="P1">
+            <part-name>Music</part-name>
+            </score-part>
+        </part-list>
+        <part id="P1">
+            <measure number="1">
+            <attributes>
+                <divisions>1</divisions>
+                <key>
+                <fifths>0</fifths>
+                </key>
+                <clef>
+                <sign>G</sign>
+                <line>2</line>
+                </clef>
+            </attributes>
 
-    {}
+            {}
 
-    </measure>
-</part>
-</score-partwise>
-    """
+            </measure>
+        </part>
+        </score-partwise>
+    """)
 
     chord_xml = ""
     note_pattern = re.compile(r"^([A-G])([b#]?)(\d)$")
 
-    for note in notes:
+    for i, note in enumerate(notes):
         match = note_pattern.match(note)
         if not match:
             raise ValueError(f"Invalid note format: {note}")
@@ -53,17 +54,18 @@ def generate_chord_xml(notes: list[str]) -> str:
         else:
             alter = '0'
 
-        chord_xml += f"""<note>
-        <chord/>
-        <pitch>
-        <step>{step}</step>
-        <alter>{alter}</alter>
-        <octave>{octave}</octave>
-        </pitch>
-        <duration>4</duration>
-        <type>whole</type>
-    </note>
-    """
+        chord_xml += textwrap.indent(textwrap.dedent(f"""
+            <note>
+                {"<chord/>" if i != 0 else ""}
+                <pitch>
+                <step>{step}</step>
+                <alter>{alter}</alter>
+                <octave>{octave}</octave>
+                </pitch>
+                <duration>4</duration>
+                <type>whole</type>
+            </note>
+        """), " " * 4)
 
     # Insert chord xml into template
     complete_xml = template_xml.format(chord_xml)
