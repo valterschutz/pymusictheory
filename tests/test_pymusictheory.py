@@ -1,4 +1,4 @@
-from pymusictheory import Interval, Note, NoteInOctave, NoteLetter
+from pymusictheory import Chord, Interval, Note, NoteInOctave, NoteLetter
 
 
 class TestNoteLetter:
@@ -307,3 +307,27 @@ class TestNoteInOctave:
             assert str(e) == "Cannot add intervals to notes with double accidentals."
         else:
             assert False, "Expected ValueError, but no error was raised"
+
+
+class TestChord:
+    def test_repr(self):
+        # Test the representation of a chord. It should be sorted
+        chord = Chord(
+            {
+                NoteInOctave.from_str("C4"),
+                NoteInOctave.from_str("G4"),
+                NoteInOctave.from_str("E4"),
+            }
+        )
+        assert repr(chord) == r"Chord({C4,E4,G4})"
+
+    def test_str(self):
+        # Test the string representation of a chord. It should be sorted
+        chord = Chord(
+            {
+                NoteInOctave.from_str("C4"),
+                NoteInOctave.from_str("G4"),
+                NoteInOctave.from_str("E4"),
+            }
+        )
+        assert str(chord) == r"{C4,E4,G4}"

@@ -1,6 +1,6 @@
 [project]
 name = "pymusictheory"
-version = "2.0.0"
+version = "2.1.0"
 description = "A python library for doing calculations with musical notes."
 readme = "README.md"
 authors = [{ name = "Valter Schütz", email = "valterschutz@proton.me" }]

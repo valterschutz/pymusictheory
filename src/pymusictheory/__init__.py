@@ -224,7 +224,7 @@ class Note:
         )
 
     def __repr__(self):
-        return f"Note({self.letter!r}, {self.alteration!r})"
+        return f"Note({self.letter}, {self.alteration})"
 
     def __hash__(self) -> int:
         return hash((self.letter, self.alteration))
@@ -382,7 +382,7 @@ class NoteInOctave:
         return self.absolute_semitone_offset
 
     def __repr__(self):
-        return f"NoteInOctave({self.note!r}, {self.octave!r})"
+        return f"NoteInOctave({self.note}, {self.octave})"
 
     def __eq__(self, other: object) -> bool:
         """
@@ -427,10 +427,6 @@ class NoteInOctave:
     def alteration(self) -> NoteAlteration:
         return self.note.alteration
 
-    # @property
-    # def semitone_offset(self) -> int:
-    #     return self.note.semitone_offset
-
 
 class Chord:
     """
@@ -442,3 +438,9 @@ class Chord:
 
     def __iter__(self):
         return iter(self.notes)
+
+    def __repr__(self):
+        return f"Chord({{{','.join(str(note) for note in sorted(self.notes))}}})"
+
+    def __str__(self):
+        return f"{{{','.join(str(note) for note in sorted(self.notes))}}}"
