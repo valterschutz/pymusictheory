@@ -235,9 +235,18 @@ class Interval(Enum):
     Enum representing musical intervals with their semitone and letter distances.
     """
 
-    MAJOR_THIRD = (4, 2)  # 4 semitones, 2 letter steps
+    PERFECT_UNISON = (0, 0)
+    MINOR_SECOND = (1, 1)
+    MAJOR_SECOND = (2, 1)
     MINOR_THIRD = (3, 2)  # 3 semitones, 2 letter steps
-    PERFECT_FIFTH = (7, 4)  # 7 semitones, 4 letter steps
+    MAJOR_THIRD = (4, 2)  # etc.
+    PERFECT_FOURTH = (5, 3)
+    PERFECT_FIFTH = (7, 4)
+    MINOR_SIXTH = (8, 5)
+    MAJOR_SIXTH = (9, 5)
+    MINOR_SEVENTH = (10, 7)
+    MAJOR_SEVENTH = (11, 7)
+    PERFECT_OCTAVE = (12, 8)
 
     @property
     def semitone_distance(self) -> int:

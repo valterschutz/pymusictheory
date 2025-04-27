@@ -209,12 +209,34 @@ class TestNoteInOctave:
         Test that adding intervals works as expected.
 
         Tested so far (in octave 4):
+        - PERFECT_UNISON
         - MINOR_THIRD
         - MAJOR_THIRD
         - PERFECT_FIFTH
+        - PERFECT_OCTAVE
+
+        Not yet tested:
+        - MINOR_SECOND
+        - MAJOR_SECOND
+        - PERFECT_FOURTH
+        - MINOR_SIXTH
+        - MAJOR_SIXTH
+        - MINOR_SEVENTH
+        - MAJOR_SEVENTH
 
         Also tested a perfect fifth with a different octave.
         """
+
+        # Random perfect unisons
+        assert NoteInOctave.from_str(
+            "C4"
+        ) + Interval.PERFECT_UNISON == NoteInOctave.from_str("C4")
+        assert NoteInOctave.from_str(
+            "C#4"
+        ) + Interval.PERFECT_UNISON == NoteInOctave.from_str("C#4")
+        assert NoteInOctave.from_str(
+            "D4"
+        ) + Interval.PERFECT_UNISON == NoteInOctave.from_str("D4")
 
         # Random minor thirds
         assert NoteInOctave.from_str(
@@ -274,6 +296,17 @@ class TestNoteInOctave:
         assert NoteInOctave.from_str(
             "D4"
         ) + Interval.PERFECT_FIFTH == NoteInOctave.from_str("A4")
+
+        # Random perfect unisons
+        assert NoteInOctave.from_str(
+            "C4"
+        ) + Interval.PERFECT_OCTAVE == NoteInOctave.from_str("C5")
+        assert NoteInOctave.from_str(
+            "C#4"
+        ) + Interval.PERFECT_OCTAVE == NoteInOctave.from_str("C#5")
+        assert NoteInOctave.from_str(
+            "D4"
+        ) + Interval.PERFECT_OCTAVE == NoteInOctave.from_str("D5")
 
         # Perfect fifths in different octaves
         assert NoteInOctave.from_str(
