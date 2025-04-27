@@ -38,8 +38,8 @@ class TestNote:
         actual = [
             Note.from_str("C").semitone_offset,
             Note.from_str("Cb").semitone_offset,
-            Note.from_str("E♭").semitone_offset,
-            Note.from_str("F♯").semitone_offset,
+            Note.from_str("Eb").semitone_offset,
+            Note.from_str("F#").semitone_offset,
             Note.from_str("B#").semitone_offset,
         ]
 
@@ -76,13 +76,13 @@ class TestNoteInOctave:
     def test_eq(self):
         # Should be equal
         assert NoteInOctave.from_str("C4") == NoteInOctave.from_str("C4")
-        assert NoteInOctave.from_str("C♭4") == NoteInOctave.from_str("B3")
-        assert NoteInOctave.from_str("C4") == NoteInOctave.from_str("B♯3")
-        assert NoteInOctave.from_str("E♯4") == NoteInOctave.from_str("F4")
-        assert NoteInOctave.from_str("G♯4") == NoteInOctave.from_str("Ab4")
+        assert NoteInOctave.from_str("Cb4") == NoteInOctave.from_str("B3")
+        assert NoteInOctave.from_str("C4") == NoteInOctave.from_str("B#3")
+        assert NoteInOctave.from_str("E#4") == NoteInOctave.from_str("F4")
+        assert NoteInOctave.from_str("G#4") == NoteInOctave.from_str("Ab4")
         # Should not be equal
         assert NoteInOctave.from_str("C4") != NoteInOctave.from_str("D4")
-        assert NoteInOctave.from_str("C4") != NoteInOctave.from_str("C♭5")
+        assert NoteInOctave.from_str("C4") != NoteInOctave.from_str("Cb5")
 
     def test_absolute_semitone_offset(self):
         assert NoteInOctave.from_str("C1").absolute_semitone_offset == 12
@@ -131,7 +131,7 @@ class TestNoteInOctave:
         expected = [
             {
                 NoteInOctave.from_str("C4"),
-                NoteInOctave.from_str("B♯3"),
+                NoteInOctave.from_str("B#3"),
             },
             {
                 NoteInOctave.from_str("Cb4"),
@@ -143,14 +143,14 @@ class TestNoteInOctave:
             },
             {
                 NoteInOctave.from_str("C5"),
-                NoteInOctave.from_str("B♯4"),
+                NoteInOctave.from_str("B#4"),
             },
             {
                 NoteInOctave.from_str("D4"),
             },
             {
-                NoteInOctave.from_str("D♯4"),
-                NoteInOctave.from_str("E♭4"),
+                NoteInOctave.from_str("D#4"),
+                NoteInOctave.from_str("Eb4"),
             },
         ]
 
@@ -171,14 +171,14 @@ class TestNoteInOctave:
         # Minor thirds
         roots = [
             NoteInOctave.from_str("C4"),
-            NoteInOctave.from_str("C♯4"),
+            NoteInOctave.from_str("C#4"),
             NoteInOctave.from_str("D4"),
         ]
 
         minor_thirds = [root + Interval.MINOR_THIRD for root in roots]
 
         expected = [
-            NoteInOctave.from_str("E♭4"),
+            NoteInOctave.from_str("Eb4"),
             NoteInOctave.from_str("E4"),
             NoteInOctave.from_str("F4"),
         ]
@@ -188,7 +188,7 @@ class TestNoteInOctave:
         # Major thirds
         roots = [
             NoteInOctave.from_str("C4"),
-            NoteInOctave.from_str("C♯4"),
+            NoteInOctave.from_str("C#4"),
             NoteInOctave.from_str("D4"),
         ]
 
@@ -196,8 +196,8 @@ class TestNoteInOctave:
 
         expected = [
             NoteInOctave.from_str("E4"),
-            NoteInOctave.from_str("E♯4"),
-            NoteInOctave.from_str("F♯4"),
+            NoteInOctave.from_str("E#4"),
+            NoteInOctave.from_str("F#4"),
         ]
 
         assert major_thirds == expected, f"Expected {expected}, but got {major_thirds}"
@@ -205,7 +205,7 @@ class TestNoteInOctave:
         # Perfect fifths
         roots = [
             NoteInOctave.from_str("C4"),
-            NoteInOctave.from_str("C♯4"),
+            NoteInOctave.from_str("C#4"),
             NoteInOctave.from_str("D4"),
         ]
 
@@ -213,7 +213,7 @@ class TestNoteInOctave:
 
         expected = [
             NoteInOctave.from_str("G4"),
-            NoteInOctave.from_str("G♯4"),
+            NoteInOctave.from_str("G#4"),
             NoteInOctave.from_str("A4"),
         ]
 
@@ -224,16 +224,16 @@ class TestNoteInOctave:
         # Perfect fifths in different octaves
         roots = [
             NoteInOctave.from_str("G4"),
-            NoteInOctave.from_str("G♯4"),
-            NoteInOctave.from_str("A♭4"),
+            NoteInOctave.from_str("G#4"),
+            NoteInOctave.from_str("Ab4"),
         ]
 
         perfect_fifths = [root + Interval.PERFECT_FIFTH for root in roots]
 
         expected = [
             NoteInOctave.from_str("D5"),
-            NoteInOctave.from_str("D♯5"),
-            NoteInOctave.from_str("E♭5"),
+            NoteInOctave.from_str("D#5"),
+            NoteInOctave.from_str("Eb5"),
         ]
 
         assert perfect_fifths == expected, (
