@@ -244,9 +244,9 @@ class Interval(Enum):
     PERFECT_FIFTH = (7, 4)
     MINOR_SIXTH = (8, 5)
     MAJOR_SIXTH = (9, 5)
-    MINOR_SEVENTH = (10, 7)
-    MAJOR_SEVENTH = (11, 7)
-    PERFECT_OCTAVE = (12, 8)
+    MINOR_SEVENTH = (10, 6)
+    MAJOR_SEVENTH = (11, 6)
+    PERFECT_OCTAVE = (12, 7)
 
     @property
     def semitone_distance(self) -> int:
