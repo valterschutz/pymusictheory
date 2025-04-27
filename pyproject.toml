@@ -3,8 +3,18 @@ name = "pymusictheory"
 version = "1.0.0"
 description = "A python library for doing calculations with musical notes."
 readme = "README.md"
+authors = [{ name = "Valter Schütz", email = "valterschutz@proton.me" }]
+license = { file = "LICENSE" }
 requires-python = ">=3.13"
 dependencies = []
+classifiers = [
+    "Topic :: Artistic Software",
+    "Topic :: Multimedia :: Sound/Audio :: Analysis",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+
 
 [dependency-groups]
 dev = [
