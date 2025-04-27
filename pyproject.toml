@@ -1,6 +1,6 @@
 [project]
 name = "pymusictheory"
-version = "1.0.0"
+version = "1.0.1"
 description = "A python library for doing calculations with musical notes."
 readme = "README.md"
 authors = [{ name = "Valter Schütz", email = "valterschutz@proton.me" }]
@@ -15,6 +15,9 @@ classifiers = [
     "Programming Language :: Python :: 3",
 ]
 
+[project.urls]
+Homepage = "https://github.com/valterschutz/pymusictheory"
+
 
 [dependency-groups]
 dev = [
@@ -28,3 +31,9 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pymusictheory"]
+
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/legacy/"
+explicit = true
