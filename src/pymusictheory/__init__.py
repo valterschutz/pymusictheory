@@ -87,6 +87,8 @@ class NoteAlteration(Enum):
     SHARP = 1
     FLAT = -1
     NATURAL = 0
+    DOUBLE_SHARP = 2
+    DOUBLE_FLAT = -2
 
     @property
     def semitone_difference(self) -> int:
@@ -106,6 +108,10 @@ class NoteAlteration(Enum):
                 return "♭"
             case NoteAlteration.NATURAL:
                 return "♮"
+            case NoteAlteration.DOUBLE_SHARP:
+                return "𝄪"
+            case NoteAlteration.DOUBLE_FLAT:
+                return "𝄫"
 
     @classmethod
     def from_str(cls, s: str) -> "NoteAlteration":
@@ -122,6 +128,14 @@ class NoteAlteration(Enum):
                 return cls.NATURAL
             case "n":
                 return cls.NATURAL
+            case "𝄪":
+                return cls.DOUBLE_SHARP
+            case "##":
+                return cls.DOUBLE_SHARP
+            case "𝄫":
+                return cls.DOUBLE_FLAT
+            case "bb":
+                return cls.DOUBLE_FLAT
             case _:
                 raise ValueError(f"Invalid alteration string: {s}")
 
@@ -142,12 +156,10 @@ class Note:
         """
         if len(s) == 1:
             return cls(NoteLetter.from_str(s), NoteAlteration.NATURAL)
-        elif len(s) == 2:
-            letter = NoteLetter.from_str(s[0])
-            alteration = NoteAlteration.from_str(s[1])
-            return cls(letter, alteration)
-        else:
-            raise ValueError(f"Invalid note string: {s}")
+
+        letter = NoteLetter.from_str(s[0])
+        alteration = NoteAlteration.from_str(s[1:])
+        return cls(letter, alteration)
 
     @property
     def semitone_offset(self) -> int:
@@ -157,18 +169,14 @@ class Note:
         Examples:
         - C = 0
         - C# = 1
+        - C## = 2
         - Cb = -1
+        - Cbb = -2
         - B# = 12
+        - B## = 13
         """
 
-        note_letter_semitone_offset = self.letter.semitone_offset
-        match self.alteration:
-            case NoteAlteration.SHARP:
-                return note_letter_semitone_offset + 1
-            case NoteAlteration.FLAT:
-                return note_letter_semitone_offset - 1
-            case NoteAlteration.NATURAL:
-                return note_letter_semitone_offset
+        return self.letter.semitone_offset + self.alteration.semitone_difference
 
     @classmethod
     def from_semitone_offset(cls, semitone_offset: int) -> set[Self]:
@@ -176,11 +184,15 @@ class Note:
         Returns all possible notes that are a specific number of semitones away from C.
 
         Examples:
-        - 0 -> C
+        - 0 -> C and Dbb
         - -1 -> Cb
+        - -2 -> Cbb
         - 1 -> C# and Db
-        - 11 -> B
+        - 7 -> G, F## and Abb
+        - 8 -> G# and Ab
+        - 11 -> B and A##
         - 12 -> B#
+        - 13 -> B##
         """
 
         # Loop through all possible enumerations of NoteLetter and NoteAlteration
@@ -259,15 +271,35 @@ class NoteInOctave:
         Returns all possible notes that are a specific number of semitones away from C0.
         """
 
-        # Find the candidate offset within the octave, and the candidate octave. For absolute semitone offsets divisible by 12, they can either be represented as C (offset 0) or B# (offset 12, octave one lower). Likewise, if the offset is 1 smaller than being divisible by 12, it can either be B (offset 11) or Cb (offset -1, octave one larger)
+        # Find the candidate offset within the octave, and the candidate octave.
+        #
+        # Edge cases close to octave changes need to be handled carefully. Let X denote an octave.
+        #
+        # Case 1: "CX" can be interpreted as being in octave X-1 (B#)
+        # Case 2: "C#X" can be interpreted as being in octave X-1 (B##)
+        # Case 3: "BY" can be interpreted as being in octave Y+1 (Cb)
+        # Case 4: "BbY" can be interpreted as being in octave Y+1 (Cbb)
+
         if absolute_semitone_offset % 12 == 0:
             semitone_offset_candidates = {0, 12}
             candidate_octaves = {
                 absolute_semitone_offset // 12,
                 absolute_semitone_offset // 12 - 1,
             }
+        elif absolute_semitone_offset % 12 == 1:
+            semitone_offset_candidates = {1, 13}
+            candidate_octaves = {
+                absolute_semitone_offset // 12,
+                absolute_semitone_offset // 12 - 1,
+            }
         elif absolute_semitone_offset % 12 == 11:
             semitone_offset_candidates = {11, -1}
+            candidate_octaves = {
+                absolute_semitone_offset // 12,
+                absolute_semitone_offset // 12 + 1,
+            }
+        elif absolute_semitone_offset % 12 == 10:
+            semitone_offset_candidates = {10, -2}
             candidate_octaves = {
                 absolute_semitone_offset // 12,
                 absolute_semitone_offset // 12 + 1,
@@ -305,6 +337,14 @@ class NoteInOctave:
         """
         Adds an interval to the note, potentially changing its octave.
         """
+
+        # This is only implemented for notes without double accidentals. Otherwise we would have to handle
+        # complex cases like B## + M3 = D###4
+        if self.note.alteration in (
+            NoteAlteration.DOUBLE_SHARP,
+            NoteAlteration.DOUBLE_FLAT,
+        ):
+            raise ValueError("Cannot add intervals to notes with double accidentals.")
 
         # Find all possible notes that are a specific number of semitones away from this note
         feasible_notes = self.from_semitone_distance(interval.semitone_distance)

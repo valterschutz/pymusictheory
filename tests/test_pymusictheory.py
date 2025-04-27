@@ -35,31 +35,42 @@ class TestNoteLetter:
 
 class TestNote:
     def test_semitone_offset(self):
-        actual = [
-            Note.from_str("C").semitone_offset,
-            Note.from_str("Cb").semitone_offset,
-            Note.from_str("Eb").semitone_offset,
-            Note.from_str("F#").semitone_offset,
-            Note.from_str("B#").semitone_offset,
-        ]
-
-        expected = [0, -1, 3, 6, 12]
-
-        assert actual == expected, f"Expected {expected}, but got {actual}"
+        assert Note.from_str("C").semitone_offset == 0
+        assert Note.from_str("C#").semitone_offset == 1
+        assert Note.from_str("C##").semitone_offset == 2
+        assert Note.from_str("Cb").semitone_offset == -1
+        assert Note.from_str("Cbb").semitone_offset == -2
+        assert Note.from_str("Eb").semitone_offset == 3
+        assert Note.from_str("F#").semitone_offset == 6
+        assert Note.from_str("B#").semitone_offset == 12
+        assert Note.from_str("B##").semitone_offset == 13
 
     def test_from_semitone_offset(self):
-        assert Note.from_semitone_offset(0) == {Note.from_str("C")}
+        assert Note.from_semitone_offset(0) == {
+            Note.from_str("C"),
+            Note.from_str("Dbb"),
+        }
         assert Note.from_semitone_offset(-1) == {Note.from_str("Cb")}
+        assert Note.from_semitone_offset(-2) == {Note.from_str("Cbb")}
         assert Note.from_semitone_offset(1) == {
             Note.from_str("C#"),
             Note.from_str("Db"),
+        }
+        assert Note.from_semitone_offset(7) == {
+            Note.from_str("G"),
+            Note.from_str("F##"),
+            Note.from_str("Abb"),
         }
         assert Note.from_semitone_offset(8) == {
             Note.from_str("G#"),
             Note.from_str("Ab"),
         }
-        assert Note.from_semitone_offset(11) == {Note.from_str("B")}
+        assert Note.from_semitone_offset(11) == {
+            Note.from_str("B"),
+            Note.from_str("A##"),
+        }
         assert Note.from_semitone_offset(12) == {Note.from_str("B#")}
+        assert Note.from_semitone_offset(13) == {Note.from_str("B##")}
 
     def test_eq(self):
         # Should be equal
@@ -70,6 +81,8 @@ class TestNote:
         assert Note.from_str("C") != Note.from_str("D")
         assert Note.from_str("Cb") != Note.from_str("B#")
         assert Note.from_str("G#") != Note.from_str("Ab")
+        assert Note.from_str("A##") != Note.from_str("B")
+        assert Note.from_str("Bbb") != Note.from_str("A")
 
 
 class TestNoteInOctave:
@@ -96,6 +109,14 @@ class TestNoteInOctave:
             [
                 NoteInOctave.from_str("E2"),
                 NoteInOctave.from_str("Fb2"),
+                NoteInOctave.from_str("D##2"),
+            ]
+        )
+        assert NoteInOctave.from_absolute_semitone_offset(31) == set(
+            [
+                NoteInOctave.from_str("G2"),
+                NoteInOctave.from_str("F##2"),
+                NoteInOctave.from_str("Abb2"),
             ]
         )
         assert NoteInOctave.from_absolute_semitone_offset(32) == set(
@@ -104,57 +125,84 @@ class TestNoteInOctave:
                 NoteInOctave.from_str("Ab2"),
             ]
         )
-        # Two edge cases
+        # Four edge cases
         assert NoteInOctave.from_absolute_semitone_offset(12) == set(
             [
                 NoteInOctave.from_str("C1"),
                 NoteInOctave.from_str("B#0"),
+                NoteInOctave.from_str("Dbb1"),
+            ]
+        )
+        assert NoteInOctave.from_absolute_semitone_offset(13) == set(
+            [
+                NoteInOctave.from_str("C#1"),
+                NoteInOctave.from_str("B##0"),
+                NoteInOctave.from_str("Db1"),
             ]
         )
         assert NoteInOctave.from_absolute_semitone_offset(11) == set(
             [
                 NoteInOctave.from_str("Cb1"),
                 NoteInOctave.from_str("B0"),
+                NoteInOctave.from_str("A##0"),
+            ]
+        )
+        assert NoteInOctave.from_absolute_semitone_offset(10) == set(
+            [
+                NoteInOctave.from_str("Cbb1"),
+                NoteInOctave.from_str("Bb0"),
+                NoteInOctave.from_str("A#0"),
             ]
         )
 
     def test_from_semitone_distance(self):
-        actual = [
-            NoteInOctave.from_str("C4").from_semitone_distance(0),
-            NoteInOctave.from_str("Cb4").from_semitone_distance(0),
-            NoteInOctave.from_str("B#4").from_semitone_distance(0),
-            NoteInOctave.from_str("G4").from_semitone_distance(5),
-            NoteInOctave.from_str("A3").from_semitone_distance(5),
-            NoteInOctave.from_str("A3").from_semitone_distance(6),
-        ]
+        actual = NoteInOctave.from_str("C4").from_semitone_distance(0)
+        expected = {
+            NoteInOctave.from_str("C4"),
+            NoteInOctave.from_str("B#3"),
+            NoteInOctave.from_str("Dbb4"),
+        }
+        assert actual == expected
 
-        expected = [
-            {
-                NoteInOctave.from_str("C4"),
-                NoteInOctave.from_str("B#3"),
-            },
-            {
-                NoteInOctave.from_str("Cb4"),
-                NoteInOctave.from_str("B3"),
-            },
-            {
-                NoteInOctave.from_str("B#4"),
-                NoteInOctave.from_str("C5"),
-            },
-            {
-                NoteInOctave.from_str("C5"),
-                NoteInOctave.from_str("B#4"),
-            },
-            {
-                NoteInOctave.from_str("D4"),
-            },
-            {
-                NoteInOctave.from_str("D#4"),
-                NoteInOctave.from_str("Eb4"),
-            },
-        ]
+        actual = NoteInOctave.from_str("Cb4").from_semitone_distance(0)
+        expected = {
+            NoteInOctave.from_str("Cb4"),
+            NoteInOctave.from_str("B3"),
+            NoteInOctave.from_str("A##3"),
+        }
+        assert actual == expected
 
-        assert actual == expected, f"Expected {expected}, but got {actual}"
+        actual = NoteInOctave.from_str("B#4").from_semitone_distance(0)
+        expected = {
+            NoteInOctave.from_str("B#4"),
+            NoteInOctave.from_str("C5"),
+            NoteInOctave.from_str("Dbb5"),
+        }
+        assert actual == expected
+
+        actual = NoteInOctave.from_str("G4").from_semitone_distance(5)
+        expected = {
+            NoteInOctave.from_str("C5"),
+            NoteInOctave.from_str("B#4"),
+            NoteInOctave.from_str("Dbb5"),
+        }
+        assert actual == expected
+
+        actual = NoteInOctave.from_str("A3").from_semitone_distance(5)
+        expected = {
+            NoteInOctave.from_str("D4"),
+            NoteInOctave.from_str("C##4"),
+            NoteInOctave.from_str("Ebb4"),
+        }
+        assert actual == expected
+
+        actual = NoteInOctave.from_str("A3").from_semitone_distance(6)
+        expected = {
+            NoteInOctave.from_str("D#4"),
+            NoteInOctave.from_str("Eb4"),
+            NoteInOctave.from_str("Fbb4"),
+        }
+        assert actual == expected
 
     def test_add_interval(self):
         """
@@ -168,74 +216,94 @@ class TestNoteInOctave:
         Also tested a perfect fifth with a different octave.
         """
 
-        # Minor thirds
-        roots = [
-            NoteInOctave.from_str("C4"),
-            NoteInOctave.from_str("C#4"),
-            NoteInOctave.from_str("D4"),
-        ]
+        # Random minor thirds
+        assert NoteInOctave.from_str(
+            "C4"
+        ) + Interval.MINOR_THIRD == NoteInOctave.from_str("Eb4")
+        assert NoteInOctave.from_str(
+            "C#4"
+        ) + Interval.MINOR_THIRD == NoteInOctave.from_str("E4")
+        assert NoteInOctave.from_str(
+            "D4"
+        ) + Interval.MINOR_THIRD == NoteInOctave.from_str("F4")
 
-        minor_thirds = [root + Interval.MINOR_THIRD for root in roots]
+        # There are no minor thirds resulting in double sharps, if we only consider starting notes with single accidentals
 
-        expected = [
-            NoteInOctave.from_str("Eb4"),
-            NoteInOctave.from_str("E4"),
-            NoteInOctave.from_str("F4"),
-        ]
+        # Minor thirds resulting in double flats
+        assert NoteInOctave.from_str(
+            "Fb4"
+        ) + Interval.MINOR_THIRD == NoteInOctave.from_str("Abb4")
+        assert NoteInOctave.from_str(
+            "Cb4"
+        ) + Interval.MINOR_THIRD == NoteInOctave.from_str("Ebb4")
 
-        assert minor_thirds == expected, f"Expected {expected}, but got {minor_thirds}"
+        # Random major thirds
+        assert NoteInOctave.from_str(
+            "C4"
+        ) + Interval.MAJOR_THIRD == NoteInOctave.from_str("E4")
+        assert NoteInOctave.from_str(
+            "C#4"
+        ) + Interval.MAJOR_THIRD == NoteInOctave.from_str("E#4")
+        assert NoteInOctave.from_str(
+            "D4"
+        ) + Interval.MAJOR_THIRD == NoteInOctave.from_str("F#4")
 
-        # Major thirds
-        roots = [
-            NoteInOctave.from_str("C4"),
-            NoteInOctave.from_str("C#4"),
-            NoteInOctave.from_str("D4"),
-        ]
+        # Major thirds resulting in double sharps
+        assert NoteInOctave.from_str(
+            "B#4"
+        ) + Interval.MAJOR_THIRD == NoteInOctave.from_str("D##5")
+        assert NoteInOctave.from_str(
+            "D#4"
+        ) + Interval.MAJOR_THIRD == NoteInOctave.from_str("F##4")
+        assert NoteInOctave.from_str(
+            "E#4"
+        ) + Interval.MAJOR_THIRD == NoteInOctave.from_str("G##4")
+        assert NoteInOctave.from_str(
+            "A#4"
+        ) + Interval.MAJOR_THIRD == NoteInOctave.from_str("C##5")
 
-        major_thirds = [root + Interval.MAJOR_THIRD for root in roots]
+        # There are no major thirds resulting in double flats, if we only consider starting notes with single accidentals
 
-        expected = [
-            NoteInOctave.from_str("E4"),
-            NoteInOctave.from_str("E#4"),
-            NoteInOctave.from_str("F#4"),
-        ]
-
-        assert major_thirds == expected, f"Expected {expected}, but got {major_thirds}"
-
-        # Perfect fifths
-        roots = [
-            NoteInOctave.from_str("C4"),
-            NoteInOctave.from_str("C#4"),
-            NoteInOctave.from_str("D4"),
-        ]
-
-        perfect_fifths = [root + Interval.PERFECT_FIFTH for root in roots]
-
-        expected = [
-            NoteInOctave.from_str("G4"),
-            NoteInOctave.from_str("G#4"),
-            NoteInOctave.from_str("A4"),
-        ]
-
-        assert perfect_fifths == expected, (
-            f"Expected {expected}, but got {perfect_fifths}"
-        )
+        # Random perfect fifths
+        assert NoteInOctave.from_str(
+            "C4"
+        ) + Interval.PERFECT_FIFTH == NoteInOctave.from_str("G4")
+        assert NoteInOctave.from_str(
+            "C#4"
+        ) + Interval.PERFECT_FIFTH == NoteInOctave.from_str("G#4")
+        assert NoteInOctave.from_str(
+            "D4"
+        ) + Interval.PERFECT_FIFTH == NoteInOctave.from_str("A4")
 
         # Perfect fifths in different octaves
-        roots = [
-            NoteInOctave.from_str("G4"),
-            NoteInOctave.from_str("G#4"),
-            NoteInOctave.from_str("Ab4"),
-        ]
+        assert NoteInOctave.from_str(
+            "G4"
+        ) + Interval.PERFECT_FIFTH == NoteInOctave.from_str("D5")
+        assert NoteInOctave.from_str(
+            "G#4"
+        ) + Interval.PERFECT_FIFTH == NoteInOctave.from_str("D#5")
+        assert NoteInOctave.from_str(
+            "Ab4"
+        ) + Interval.PERFECT_FIFTH == NoteInOctave.from_str("Eb5")
 
-        perfect_fifths = [root + Interval.PERFECT_FIFTH for root in roots]
+        # Perfect fifths with double sharps
+        assert NoteInOctave.from_str(
+            "B#4"
+        ) + Interval.PERFECT_FIFTH == NoteInOctave.from_str("F##5")
+        assert NoteInOctave.from_str(
+            "E#4"
+        ) + Interval.PERFECT_FIFTH == NoteInOctave.from_str("B#4")
 
-        expected = [
-            NoteInOctave.from_str("D5"),
-            NoteInOctave.from_str("D#5"),
-            NoteInOctave.from_str("Eb5"),
-        ]
+        # There are no perfect fifths resulting in double flats, if we only consider starting notes with single accidentals
 
-        assert perfect_fifths == expected, (
-            f"Expected {expected}, but got {perfect_fifths}"
-        )
+        # We expect an error if we try to add an interval to a note that already has a double accidental
+        # This would necessitate handling of complex cases like B## + M3 = D### which are
+        # never used in practice
+
+        # Assert that code should raise an error
+        try:
+            NoteInOctave.from_str("B##4") + Interval.MAJOR_THIRD
+        except ValueError as e:
+            assert str(e) == "Cannot add intervals to notes with double accidentals."
+        else:
+            assert False, "Expected ValueError, but no error was raised"

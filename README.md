@@ -2,6 +2,12 @@
 
 `pymusictheory` is a Python library for performing calculations with musical notes. It provides tools to work with notes, intervals, and chords, both in the context of octaves and without. This library is useful for music theory analysis, algorithmic composition, and other musical applications.
 
+Key features:
+- Correctly returning double accidentals when adding intervals to notes. Example: B# + M3 = D##
+
+Not implemented:
+- Adding intervals to notes with double accidentals. For example, B## + M3 = D###
+
 ## Overview of Classes
 
 ### 1. `NoteLetter`
@@ -104,6 +110,10 @@ from pymusictheory import NoteInOctave, Interval
 note = NoteInOctave.from_str("C4")
 new_note = note + Interval.PERFECT_FIFTH
 print(new_note)  # Output: G4
+
+note = NoteInOctave.from_str("B#3")
+new_note = note + Interval.MAJOR_THIRD
+print(new_note)  # Output: D##4
 ```
 
 ### 3. Generate Chords
