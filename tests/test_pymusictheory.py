@@ -2,7 +2,7 @@ from pymusictheory import Chord, Interval, Note, NoteInOctave, NoteLetter
 
 
 class TestNoteLetter:
-    def test_addition(self):
+    def test_addition(self) -> None:
         actual = [
             NoteLetter.C + 4,
             NoteLetter.E + 7,
@@ -17,7 +17,7 @@ class TestNoteLetter:
 
         assert actual == expected, f"Expected {expected}, but got {actual}"
 
-    def test_subtraction(self):
+    def test_subtraction(self) -> None:
         actual = [
             NoteLetter.C - 4,
             NoteLetter.E - 7,
@@ -34,7 +34,7 @@ class TestNoteLetter:
 
 
 class TestNote:
-    def test_semitone_offset(self):
+    def test_semitone_offset(self) -> None:
         assert Note.from_str("C").semitone_offset == 0
         assert Note.from_str("C#").semitone_offset == 1
         assert Note.from_str("C##").semitone_offset == 2
@@ -45,7 +45,7 @@ class TestNote:
         assert Note.from_str("B#").semitone_offset == 12
         assert Note.from_str("B##").semitone_offset == 13
 
-    def test_from_semitone_offset(self):
+    def test_from_semitone_offset(self) -> None:
         assert Note.from_semitone_offset(0) == {
             Note.from_str("C"),
             Note.from_str("Dbb"),
@@ -72,7 +72,7 @@ class TestNote:
         assert Note.from_semitone_offset(12) == {Note.from_str("B#")}
         assert Note.from_semitone_offset(13) == {Note.from_str("B##")}
 
-    def test_eq(self):
+    def test_eq(self) -> None:
         # Should be equal
         assert Note.from_str("C") == Note.from_str("C")
         assert Note.from_str("Cb") == Note.from_str("Cb")
@@ -86,7 +86,7 @@ class TestNote:
 
 
 class TestNoteInOctave:
-    def test_eq(self):
+    def test_eq(self) -> None:
         # Should be equal
         assert NoteInOctave.from_str("C4") == NoteInOctave.from_str("C4")
         assert NoteInOctave.from_str("Cb4") == NoteInOctave.from_str("B3")
@@ -97,14 +97,14 @@ class TestNoteInOctave:
         assert NoteInOctave.from_str("C4") != NoteInOctave.from_str("D4")
         assert NoteInOctave.from_str("C4") != NoteInOctave.from_str("Cb5")
 
-    def test_absolute_semitone_offset(self):
+    def test_absolute_semitone_offset(self) -> None:
         assert NoteInOctave.from_str("C1").absolute_semitone_offset == 12
         assert NoteInOctave.from_str("C2").absolute_semitone_offset == 24
         assert NoteInOctave.from_str("Cb2").absolute_semitone_offset == 23
         assert NoteInOctave.from_str("B#1").absolute_semitone_offset == 24
         assert NoteInOctave.from_str("G#2").absolute_semitone_offset == 32
 
-    def test_from_absolute_semitone_offset(self):
+    def test_from_absolute_semitone_offset(self) -> None:
         assert NoteInOctave.from_absolute_semitone_offset(28) == set(
             [
                 NoteInOctave.from_str("E2"),
@@ -155,7 +155,7 @@ class TestNoteInOctave:
             ]
         )
 
-    def test_from_semitone_distance(self):
+    def test_from_semitone_distance(self) -> None:
         actual = NoteInOctave.from_str("C4").from_semitone_distance(0)
         expected = {
             NoteInOctave.from_str("C4"),
@@ -204,7 +204,7 @@ class TestNoteInOctave:
         }
         assert actual == expected
 
-    def test_add_interval(self):
+    def test_add_interval(self) -> None:
         """
         Test that adding intervals works as expected.
 
@@ -343,7 +343,7 @@ class TestNoteInOctave:
 
 
 class TestChord:
-    def test_repr(self):
+    def test_repr(self) -> None:
         # Test the representation of a chord. It should be sorted
         chord = Chord(
             {
@@ -354,7 +354,7 @@ class TestChord:
         )
         assert repr(chord) == r"Chord({C4,E4,G4})"
 
-    def test_str(self):
+    def test_str(self) -> None:
         # Test the string representation of a chord. It should be sorted
         chord = Chord(
             {

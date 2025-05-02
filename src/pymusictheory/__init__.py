@@ -10,6 +10,7 @@ Vocabulary:
 from enum import Enum
 from functools import total_ordering
 from typing import Self
+from collections.abc import Iterator
 
 
 # Enum for musical note letters
@@ -100,7 +101,7 @@ class NoteAlteration(Enum):
     def __int__(self) -> int:
         return self.semitone_difference
 
-    def __str__(self):
+    def __str__(self) -> str:
         match self:
             case NoteAlteration.SHARP:
                 return "♯"
@@ -216,14 +217,14 @@ class Note:
 
     # lt is not implemented because it doesn't make sense to compare notes without an octave
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f"{self.letter}{self.alteration}"
             if self.alteration != NoteAlteration.NATURAL
             else str(self.letter)
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Note({self.letter}, {self.alteration})"
 
     def __hash__(self) -> int:
@@ -371,7 +372,7 @@ class NoteInOctave:
 
         return new_note
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.note}{self.octave}"
 
     @property
@@ -384,13 +385,13 @@ class NoteInOctave:
 
         return absolute_semitone_offset
 
-    def __int__(self):
+    def __int__(self) -> int:
         """
         The integer representation of the note is absolute semitone offset.
         """
         return self.absolute_semitone_offset
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"NoteInOctave({self.note}, {self.octave})"
 
     def __eq__(self, other: object) -> bool:
@@ -445,11 +446,11 @@ class Chord:
     def __init__(self, notes: set[NoteInOctave]):
         self.notes = notes
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[NoteInOctave]:
         return iter(self.notes)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Chord({{{','.join(str(note) for note in sorted(self.notes))}}})"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{{{','.join(str(note) for note in sorted(self.notes))}}}"

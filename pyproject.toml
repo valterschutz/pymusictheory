@@ -1,6 +1,6 @@
 [project]
 name = "pymusictheory"
-version = "2.2.1"
+version = "2.2.2"
 description = "A python library for doing calculations with musical notes."
 readme = "README.md"
 authors = [{ name = "Valter Schütz", email = "valterschutz@proton.me" }]
@@ -21,6 +21,7 @@ Homepage = "https://github.com/valterschutz/pymusictheory"
 
 [dependency-groups]
 dev = [
+    "mypy>=1.15.0",
     "pytest>=8.3.5",
     "ruff>=0.11.7",
 ]
@@ -37,3 +38,6 @@ name = "testpypi"
 url = "https://test.pypi.org/simple/"
 publish-url = "https://test.pypi.org/legacy/"
 explicit = true
+
+[tool.mypy]
+strict = true
