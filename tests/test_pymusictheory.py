@@ -205,8 +205,7 @@ class TestNoteInOctave:
         assert actual == expected
 
     def test_add_interval(self) -> None:
-        """
-        Test that adding intervals works as expected.
+        """Test that adding intervals works as expected.
 
         Tested so far (in octave 4):
         - PERFECT_UNISON
@@ -226,7 +225,6 @@ class TestNoteInOctave:
 
         Also tested a perfect fifth with a different octave.
         """
-
         # Random perfect unisons
         assert NoteInOctave.from_str(
             "C4"
@@ -339,7 +337,7 @@ class TestNoteInOctave:
         except ValueError as e:
             assert str(e) == "Cannot add intervals to notes with double accidentals."
         else:
-            assert False, "Expected ValueError, but no error was raised"
+            raise AssertionError
 
 
 class TestChord:

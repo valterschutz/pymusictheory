@@ -1,5 +1,4 @@
-"""
-Calculations on notes, both in the context of octaves and without.
+"""Calculations on notes, both in the context of octaves and without.
 
 Vocabulary:
 "semitone offset": The number of semitones away from C in the octave.
@@ -15,9 +14,7 @@ from collections.abc import Iterator
 
 # Enum for musical note letters
 class NoteLetter(Enum):
-    """
-    Enum representing musical note letters.
-    """
+    """Enum representing musical note letters."""
 
     C = 0
     D = 1
@@ -31,24 +28,18 @@ class NoteLetter(Enum):
         return self.name
 
     def __add__(self, other: int) -> "NoteLetter":
-        """
-        When adding letters, treat them as integers and wrap around if necessary.
-        """
+        """When adding letters, treat them as integers and wrap around if necessary."""
         new_value = (self.value + other) % len(NoteLetter)
         return NoteLetter(new_value)
 
     def __sub__(self, other: int) -> "NoteLetter":
-        """
-        When subtracting letters, treat them as integers and wrap around if necessary.
-        """
+        """When subtracting letters, treat them as integers and wrap around if necessary."""
         new_value = (self.value - other) % len(NoteLetter)
         return NoteLetter(new_value)
 
     @property
     def semitone_offset(self) -> int:
-        """
-        Returns how many semitones this letter is away from C.
-        """
+        """Returns how many semitones this letter is away from C."""
         match self:
             case NoteLetter.C:
                 return 0
@@ -71,9 +62,7 @@ class NoteLetter(Enum):
 
     @classmethod
     def from_str(cls, s: str) -> "NoteLetter":
-        """
-        Converts a string to a NoteLetter by matching the string with the name of each enum variant.
-        """
+        """Convert a string to a NoteLetter by matching the string with the name of each                    enum variant."""
         for note in cls:
             if note.name == s:
                 return note
@@ -81,9 +70,7 @@ class NoteLetter(Enum):
 
 
 class NoteAlteration(Enum):
-    """
-    Enum representing musical note alterations.
-    """
+    """Enum representing musical note alterations."""
 
     SHARP = 1
     FLAT = -1
@@ -93,9 +80,7 @@ class NoteAlteration(Enum):
 
     @property
     def semitone_difference(self) -> int:
-        """
-        Returns how many semitones this alteration modifies the note by.
-        """
+        """Returns how many semitones this alteration modifies the note by."""
         return self.value
 
     def __int__(self) -> int:
@@ -116,35 +101,25 @@ class NoteAlteration(Enum):
 
     @classmethod
     def from_str(cls, s: str) -> "NoteAlteration":
-        match s:
-            case "♯":
-                return cls.SHARP
-            case "#":
-                return cls.SHARP
-            case "♭":
-                return cls.FLAT
-            case "b":
-                return cls.FLAT
-            case "♮":
-                return cls.NATURAL
-            case "n":
-                return cls.NATURAL
-            case "𝄪":
-                return cls.DOUBLE_SHARP
-            case "##":
-                return cls.DOUBLE_SHARP
-            case "𝄫":
-                return cls.DOUBLE_FLAT
-            case "bb":
-                return cls.DOUBLE_FLAT
-            case _:
-                raise ValueError(f"Invalid alteration string: {s}")
+        try:
+            return {
+                "♯": cls.SHARP,
+                "#": cls.SHARP,
+                "♭": cls.FLAT,
+                "b": cls.FLAT,
+                "♮": cls.NATURAL,
+                "n": cls.NATURAL,
+                "𝄪": cls.DOUBLE_SHARP,
+                "##": cls.DOUBLE_SHARP,
+                "𝄫": cls.DOUBLE_FLAT,
+                "bb": cls.DOUBLE_FLAT,
+            }[s]
+        except KeyError as err:
+            raise ValueError(f"Invalid alteration string: {s}") from err
 
 
 class Note:
-    """
-    An abstract musical note, without a specific octave.
-    """
+    """An abstract musical note, without a specific octave."""
 
     def __init__(self, letter: NoteLetter, alteration: NoteAlteration):
         self.letter = letter
@@ -152,9 +127,7 @@ class Note:
 
     @classmethod
     def from_str(cls, s: str) -> Self:
-        """
-        Allows creating a Note from a string representation like "C", "C#" or "Db".
-        """
+        """Create a Note from a string representation like "C", "C#" or "Db"."""
         if len(s) == 1:
             return cls(NoteLetter.from_str(s), NoteAlteration.NATURAL)
 
@@ -164,8 +137,7 @@ class Note:
 
     @property
     def semitone_offset(self) -> int:
-        """
-        Returns how many semitones away from C this note is. The semitone offset is the sum of the letter's semitone offset and the alteration's semitone difference.
+        """Returns how many semitones away from C this note is. The semitone offset is the sum of the letter's semitone offset and the alteration's semitone difference.
 
         Examples:
         - C = 0
@@ -175,14 +147,13 @@ class Note:
         - Cbb = -2
         - B# = 12
         - B## = 13
-        """
 
+        """
         return self.letter.semitone_offset + self.alteration.semitone_difference
 
     @classmethod
     def from_semitone_offset(cls, semitone_offset: int) -> set[Self]:
-        """
-        Returns all possible notes that are a specific number of semitones away from C.
+        """Return all possible notes that are a specific number of semitones away from C.
 
         Examples:
         - 0 -> C and Dbb
@@ -194,8 +165,8 @@ class Note:
         - 11 -> B and A##
         - 12 -> B#
         - 13 -> B##
-        """
 
+        """
         # Loop through all possible enumerations of NoteLetter and NoteAlteration
         notes = set(
             cls(note_letter, note_alteration)
@@ -208,9 +179,7 @@ class Note:
         return notes
 
     def __eq__(self, other: object) -> bool:
-        """
-        Two non-octaved notes are only equal if they have the same letter and alteration.
-        """
+        """Two non-octaved notes are only equal if they have the same letter and alteration."""
         if not isinstance(other, Note):
             return NotImplemented
         return self.letter == other.letter and self.alteration == other.alteration
@@ -232,9 +201,7 @@ class Note:
 
 
 class Interval(Enum):
-    """
-    Enum representing musical intervals with their semitone and letter distances.
-    """
+    """Enum representing musical intervals with their semitone and letter distances."""
 
     PERFECT_UNISON = (0, 0)
     MINOR_SECOND = (1, 1)
@@ -251,24 +218,18 @@ class Interval(Enum):
 
     @property
     def semitone_distance(self) -> int:
-        """
-        Get the semitone distance of the interval.
-        """
+        """Get the semitone distance of the interval."""
         return self.value[0]
 
     @property
     def letter_distance(self) -> int:
-        """
-        Get the letter distance of the interval.
-        """
+        """Get the letter distance of the interval."""
         return self.value[1]
 
 
 @total_ordering
 class NoteInOctave:
-    """
-    A concrete musical note in a specific octave
-    """
+    """A concrete musical note in a specific octave."""
 
     def __init__(self, note: Note, octave: int):
         self.note = note
@@ -277,10 +238,7 @@ class NoteInOctave:
 
     @classmethod
     def from_absolute_semitone_offset(cls, absolute_semitone_offset: int) -> set[Self]:
-        """
-        Returns all possible notes that are a specific number of semitones away from C0.
-        """
-
+        """Return all possible notes that are a specific number of semitones away from C0."""
         # Find the candidate offset within the octave, and the candidate octave.
         #
         # Edge cases close to octave changes need to be handled carefully. Let X denote an octave.
@@ -335,19 +293,13 @@ class NoteInOctave:
         )
 
     def from_semitone_distance(self, semitone_offset: int) -> set["NoteInOctave"]:
-        """
-        Returns all possible notes that are a specific number of semitones away from this note
-        """
-
+        """Return all possible notes that are a specific number of semitones away from this note."""
         return NoteInOctave.from_absolute_semitone_offset(
             self.absolute_semitone_offset + semitone_offset
         )
 
     def __add__(self, interval: Interval) -> "NoteInOctave":
-        """
-        Adds an interval to the note, potentially changing its octave.
-        """
-
+        """Add an interval to the note, potentially changing its octave."""
         # This is only implemented for notes without double accidentals. Otherwise we would have to handle
         # complex cases like B## + M3 = D###4
         if self.note.alteration in (
@@ -377,36 +329,28 @@ class NoteInOctave:
 
     @property
     def absolute_semitone_offset(self) -> int:
-        """
-        The absolute semitone offset of the note is the semitone offset from C0.
-        """
+        """The absolute semitone offset of the note is the semitone offset from C0."""
         # absolute_semitone_offset = 12*self.octave + self.note.letter.semitone_offset + self.note.alteration.semitone_difference
         absolute_semitone_offset = 12 * self.octave + self.note.semitone_offset
 
         return absolute_semitone_offset
 
     def __int__(self) -> int:
-        """
-        The integer representation of the note is absolute semitone offset.
-        """
+        # The integer representation of the note is absolute semitone offset
         return self.absolute_semitone_offset
 
     def __repr__(self) -> str:
         return f"NoteInOctave({self.note}, {self.octave})"
 
     def __eq__(self, other: object) -> bool:
-        """
-        Comparison is forwarded to the absolute semitone offset.
-        """
+        """Comparison is forwarded to the absolute semitone offset."""
         assert isinstance(other, NoteInOctave), (
             "Cannot compare NoteInOctave with non-NoteInOctave object"
         )
         return self.absolute_semitone_offset == other.absolute_semitone_offset
 
     def __lt__(self, other: object) -> bool:
-        """
-        Comparison is forwarded to the absolute semitone offset.
-        """
+        """Comparison is forwarded to the absolute semitone offset."""
         assert isinstance(other, NoteInOctave), (
             "Cannot compare NoteInOctave with non-NoteInOctave object"
         )
@@ -417,8 +361,7 @@ class NoteInOctave:
 
     @classmethod
     def from_str(cls, s: str) -> Self:
-        """
-        Converts a string to an octaved note by splitting the string into note and octave parts.
+        """Convert a string to an octaved note by splitting the string into note and octave parts.
 
         Examples: NoteInOctave.from_str("C4"), NoteInOctave.from_str("D♯5"), NoteInOctave.from_str("B♭3")
         """
@@ -439,9 +382,7 @@ class NoteInOctave:
 
 
 class Chord:
-    """
-    A Chord is a set of octaved notes.
-    """
+    """A Chord is a set of octaved notes."""
 
     def __init__(self, notes: set[NoteInOctave]):
         self.notes = notes
